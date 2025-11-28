@@ -1,0 +1,69 @@
+
+
+import os
+import sys
+import win32com.client # <--- Usamos el cliente COM directo de Windows
+from . import ruth_backend 
+
+class RuthAssistant:
+    def __init__(self):
+        self.name = "Ruth"
+        self.version = "0.4 (SAPI Native)" 
+        
+        # --- NUEVA CONFIGURACIÓN DE VOZ (SAPI DIRECTO) ---
+        try:
+            # Invocamos al espíritu de Windows directamente
+            self.speaker = win32com.client.Dispatch("SAPI.SpVoice")
+            self.speaker.Volume = 100  # 0 a 100
+            self.speaker.Rate = 1      # -10 a 10 (1 es velocidad normal)
+            
+            # Buscamos a Sabina (o cualquier voz en español México)
+            voices = self.speaker.GetVoices()
+            for voice in voices:
+                desc = voice.GetDescription()
+                # print(f"Voz detectada: {desc}") # Descomenta si quieres verlas
+                if "mexico" in desc.lower() or "sabina" in desc.lower():
+                    self.speaker.Voice = voice
+                    break
+        except Exception as e:
+            print(f"⚠️ Error inicializando voz SAPI: {e}")
+            self.speaker = None
+        # --- FIN CONFIGURACIÓN ---
+
+        self.system_info = self._load_system_info()
+    
+    def _load_system_info(self):
+        try:
+            return ruth_backend.get_system_info()
+        except Exception as e:
+            print(f"⚠️ Error cargando motor C++: {e}")
+            return {"pc_name": "Unknown", "user": "Guest"}
+
+    def speak(self, text):
+        """El método que le da voz a Ruth (Versión Estable)"""
+        print(f"🗣️ RUTH: {text}") 
+        if self.speaker:
+            # El Flag 1 (SVSFlagsAsync) permite que hable sin congelar TODO el programa,
+            # pero para narrar acciones, a veces preferimos que termine de hablar antes de actuar.
+            # Por ahora lo dejaremos síncrono (sin flags) para asegurar que narre.
+            try:
+                self.speaker.Speak(text)
+            except:
+                pass
+
+    def introduce_self(self):
+        intro_text = f"Comando espacial, atención comando espacial. Sistemas en línea. Hola Inge. Soy Ruth, tu primer modelo de asistente virtual e inteligencia artificial, estoy a tu servicio. Conectada a {self.system_info['pc_name']}."
+        self.speak(intro_text)
+
+    def execute_app(self, app_name, args=""):
+        # Narramos la acción
+        self.speak(f"Abriendo {app_name}")
+        
+        if app_name.lower() == "notepad.exe" or app_name.lower() == "notepad":
+            app_name = "cmd.exe"
+            args = "/c start notepad"
+            
+        success = ruth_backend.run_process(app_name, args)
+        return success
+    
+    # Ya no necesitamos el __del__ complicado porque SAPI se limpia solo

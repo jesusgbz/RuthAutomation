@@ -30,3 +30,13 @@ message(STATUS "---------------------------------------------------")
 message(STATUS "RUTH CONFIG: Usando Python en: ${Python3_EXECUTABLE}")
 message(STATUS "RUTH CONFIG: Versión detectada: ${Python3_VERSION}")
 message(STATUS "---------------------------------------------------")
+
+# 5. AUTOMATIZACIÓN (La cinta transportadora)
+# Esto le dice a CMake: "Después de construir (POST_BUILD) el objetivo 'ruth_backend',
+# copia el archivo resultante a la carpeta donde vive el script de Python".
+add_custom_command(TARGET ruth_backend POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        $<TARGET_FILE:ruth_backend>
+        "${CMAKE_CURRENT_SOURCE_DIR}/src/python/ruth/$<TARGET_FILE_NAME:ruth_backend>"
+    COMMENT "📦 Copiando modulo compilado a src/python/ruth..."
+)
