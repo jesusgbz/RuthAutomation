@@ -1,0 +1,22 @@
+# Prerrequisitos de Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.env
+
+# Prerrequisitos de C++
+*.obj
+*.exe
+*.dll
+*.lib
+*.iso
+
+# Compilados y Build
+build/
+out/
+x64/
+Debug/
+Release/
+.vs/
+*.user
