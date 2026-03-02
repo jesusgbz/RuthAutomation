@@ -25,6 +25,9 @@ add_subdirectory(extern/pybind11)
 # 4. Creamos el módulo
 pybind11_add_module(ruth_backend src/cpp/main.cpp)
 
+# Le damos permiso a Ruth de usar Internet y Multimedia
+target_link_libraries(ruth_backend PRIVATE wininet Mmdevapi)
+
 # Mensajes de confirmación (Para que duermas tranquilo)
 message(STATUS "---------------------------------------------------")
 message(STATUS "RUTH CONFIG: Usando Python en: ${Python3_EXECUTABLE}")

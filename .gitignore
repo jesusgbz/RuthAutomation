@@ -3,7 +3,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 venv/
-.env
+env/
 
 # Prerrequisitos de C++
 *.obj
@@ -20,3 +20,9 @@ Debug/
 Release/
 .vs/
 *.user
+
+config.yaml
+.env
+
+# Modelos pesados de IA local (Vosk, etc.)
+src/python/model/

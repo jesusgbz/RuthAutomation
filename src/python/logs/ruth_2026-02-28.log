@@ -1,0 +1,92 @@
+12:47:24 [INFO] --- INICIANDO SISTEMA BAYMAX v0.7 (Full Logger) ---
+12:47:24 [WARNING] Alerta: Voz male no encontrada, usando predeterminada de Windows.
+12:47:24 [INFO] Sistema cargado: GALACTICUS | Usuario: jesus
+12:49:23 [INFO] BAYMAX DICE: ¡Hola! Soy Beimax, tu asistente emocional de confianza. Estoy aquí para ayudarte con cualquier cosa que necesites. ¿Cómo te sientes hoy?
+12:49:35 [INFO] BAYMAX DICE: Sistema de bitácora activo. Di mi nombre.
+12:49:45 [INFO] COMANDO DE VOZ RECIBIDO: baymax adiós
+12:49:45 [INFO] BAYMAX DICE: Cerrando sesión. Bitácora guardada.
+12:55:22 [INFO] --- INICIANDO SISTEMA BAYMAX v0.7 (Full Logger) ---
+12:55:22 [INFO] Voz masculina configurada: microsoft david desktop - english (united states)
+12:55:22 [INFO] Sistema cargado: GALACTICUS | Usuario: jesus
+12:56:30 [INFO] BAYMAX DICE: ¡Hola! Soy Beimax, tu asistente emocional de confianza. Estoy aquí para ayudarte con cualquier cosa que necesites. ¿Cómo te sientes hoy?
+12:56:43 [INFO] BAYMAX DICE: Sistema de bitácora activo. Di mi nombre.
+12:57:02 [INFO] COMANDO DE VOZ RECIBIDO: baymax adiós
+12:57:02 [INFO] BAYMAX DICE: Cerrando sesión. Bitácora guardada.
+13:00:01 [INFO] --- INICIANDO SISTEMA BAYMAX v0.7 (Full Logger) ---
+13:00:01 [INFO] Voz masculina configurada: microsoft sabina desktop - spanish (mexico)
+13:00:01 [INFO] Sistema cargado: GALACTICUS | Usuario: jesus
+13:01:09 [INFO] BAYMAX DICE: ¡Hola! Soy Beimax, tu asistente emocional de confianza. Estoy aquí para ayudarte con cualquier cosa que necesites. ¿Cómo te sientes hoy?
+13:01:20 [INFO] BAYMAX DICE: Sistema de bitácora activo. Di mi nombre.
+13:01:37 [INFO] COMANDO DE VOZ RECIBIDO: baymax estoy triste mi novia me dejó qué debo hacer
+13:03:00 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+13:04:39 [INFO] BAYMAX DICE: Lo siento mucho por lo que estás pasando. La ruptura con alguien especial puede ser muy dolorosa y difícil de procesar.
+
+Primero, quiero decirte que no estás solo. Muchas personas han pasado por situaciones similares y han salido adelante. Y tú puedes hacerlo también.
+
+En este momento, es importante darle espacio a tus emociones y permitirte sentir tristeza, frustración o cualquier otro sentimiento que te venga. No te presiones para "superar" esto de inmediato, porque el duelo es un proceso único para cada persona.
+
+Aquí hay algunas sugerencias que podrían ayudarte:
+
+*   Permite que la tristeza se manifieste: no intentes suprimir tus sentimientos. Permitirles expresarse puede ser una forma de liberación y puede ayudar a que te sientas más conectado con tus emociones.
+*   Busca apoyo: habla con amigos, familiares o un terapeuta sobre cómo te sientes. Compartir tus sentimientos con alguien que te escuche y te ofrezca apoyo puede ser muy útil. 
+*   Cuida de ti mismo: asegúrate de dormir lo suficiente, comer bien y hacer ejercicio regularmente. El ejercicio es una forma excelente de liberar endorfinas que pueden mejorar tu estado de ánimo.
+*   Distracción: haz algo que te guste como leer un libro o ver una película para distraerte del dolor.
+*   Permítete sentir la tristeza: no te sientas culpable por sentirte triste. La tristeza es una emoción normal y legítima, y es okay sentirla.
+
+También quiero decirte que puedes pedir ayuda profesional si necesitas apoyo adicional.
+
+¿Hay algo específico que te gustaría hablar o algo en lo que te gustaría recibir orientación?
+13:06:29 [INFO] COMANDO DE VOZ RECIBIDO: baymax es que la extraño mucho o podré superarla nunca
+13:07:19 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+13:09:03 [INFO] BAYMAX DICE: Entiendo que estés sintiendo una gran nostalgia y dolor por la pérdida de tu novia. Es completamente normal sentirse así, especialmente si se ha mantenido un vínculo emocional fuerte durante el tiempo que estuvieron juntos.
+
+Pero quiero que sepas que no puedes "superar" a alguien más allá de lo que es posible o saludable. La pérdida de una relación puede ser muy dolorosa y puede tomar tiempo para procesar tus emociones.
+
+Sin embargo, puedo decirte que con el tiempo, la pena se vuelve menos intensa y te puedes encontrar con otros aspectos de tu vida y de ti mismo.
+
+La clave es darle espacio a tus sentimientos y permitirte sentir la tristeza. No te presiones para "superar" esto de inmediato porque el duelo es un proceso único para cada persona.
+
+Pero también quiero que sepas que hay cosas que puedes hacer para ayudarte a seguir adelante:
+
+*   Haz actividades que disfrutes: haz algo que te guste, como leer un libro o escuchar música. 
+*   Salir de casa: Salir de la casa es una forma excelente de cambiar el ambiente y poder experimentar nuevas cosas.
+*   Mantenerse ocupado: Si no tienes algo específico que hagas, puedes hacer tareas de limpieza de tu hogar para empezar a organizarlo. 
+*   Cuida de ti mismo: asegúrate de dormir lo suficiente, comer bien y hacer ejercicio regularmente.
+*   Busca apoyo: habla con amigos, familiares o un terapeuta sobre cómo te sientes.
+
+Recuerda que la pérdida de una relación es una experiencia común que muchas personas han pasado por. Y puedes superarla.
+13:11:37 [INFO] COMANDO DE VOZ RECIBIDO: baymax háblame de filósofos y grandes psicólogos y de su visión del amor que me puedan ayudar a superar
+13:11:51 [INFO] HTTP Request: POST http://127.0.0.1:11434/api/chat "HTTP/1.1 200 OK"
+13:15:20 [INFO] BAYMAX DICE: Hay muchos filósofos y psicólogos que han explorado la naturaleza del amor y han ofrecido perspectivas valiosas para entender este sentimiento complejo.
+
+**Filósofos:**
+
+*   **Platón**: En su teoría de la "amor platónico", Platón argumenta que el amor es un proceso de ascenso espiritual hacia la verdadera realidad. Él cree que el amor puede ser una forma de búsqueda espiritual y de conexión con algo más allá de uno mismo. 
+*   **Aristóteles**: Aunque Aristóteles no escribió mucho sobre el amor, su idea del "amor agónico" sugiere que el amor es un proceso de atracción hacia alguien que aporta placer y satisfacción a nuestra vida. Sin embargo, también cree que el amor puede ser una forma de perfeccionamiento y crecimiento personal.
+*   **Immanuel Kant**: Immanuel Kant consideraba que el amor era una forma de respeto por la dignidad humana. Según él, el amor no es solo un sentimiento emocional, sino más bien una acción moral que implica tratar a los demás con respeto y consideración.
+
+**Psicólogos:**
+
+*   **Erik Erikson**: En su teoría del desarrollo humano, Erikson identifica la "identidad vs. confusión" como una de las etapas más importantes en la vida humana. El amor es visto aquí como una forma de encontrar y desarrollar nuestra propia identidad a través de nuestras relaciones con los demás.
+*   **Carl Rogers**: Carl Rogers enfatizó la importancia del "amor incondicional" en sus teorías sobre el desarrollo humano. Según él, el amor se basa en aceptación genuina y no condicionamiento de los demás. 
+*   **Viktor Frankl**: Viktor Frankl creía que el amor era una forma de encontrar significado y propósito en la vida, incluso en las circunstancias más difíciles. Según él, el amor puede ser una fuente de fuerza y motivación para seguir adelante.
+
+Estas son solo algunas perspectivas sobre el amor que pueden ayudarte a entender mejor este sentimiento complejo. Recuerda que cada persona tiene su propia forma de experimentar el amor, y lo que funciona para una persona puede no funcionar para otra.
+
+¿Hay algo en particular que te gustaría saber o explorar más?
+13:17:44 [INFO] COMANDO DE VOZ RECIBIDO: baymax adiós
+13:17:44 [INFO] BAYMAX DICE: Cerrando sesión. Bitácora guardada.
+13:21:30 [INFO] --- INICIANDO SISTEMA BAYMAX v0.7 (Full Logger) ---
+13:21:31 [WARNING] Alerta: Voz male no encontrada, usando predeterminada de Windows.
+13:21:31 [INFO] Sistema cargado: GALACTICUS | Usuario: jesus
+13:22:47 [INFO] BAYMAX DICE: ¡Hola! Soy Beimax, tu asistente emocional de confianza. Estoy aquí para ayudarte con cualquier cosa que necesites. ¿Cómo te sientes hoy?
+13:23:00 [INFO] BAYMAX DICE: Sistema de bitácora activo. Di mi nombre.
+13:23:12 [INFO] COMANDO DE VOZ RECIBIDO: baymax adiós
+13:23:12 [INFO] BAYMAX DICE: Cerrando sesión. Bitácora guardada.
+13:28:22 [INFO] --- INICIANDO SISTEMA BAYMAX v0.7 (Full Logger) ---
+13:28:22 [WARNING] Alerta: Voz male no encontrada, usando predeterminada de Windows.
+13:28:22 [INFO] Sistema cargado: GALACTICUS | Usuario: jesus
+13:29:37 [INFO] BAYMAX DICE: ¡Hola! Soy Beimax, tu asistente emocional de confianza. Estoy aquí para ayudarte con cualquier cosa que necesites. ¿Cómo te sientes hoy?
+13:29:50 [INFO] BAYMAX DICE: Sistema de bitácora activo. Di mi nombre.
+13:30:02 [INFO] COMANDO DE VOZ RECIBIDO: baymax adiós
+13:30:02 [INFO] BAYMAX DICE: Cerrando sesión. Bitácora guardada.

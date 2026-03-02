@@ -7,6 +7,10 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <wininet.h>
+#include <mmdeviceapi.h>
+#include <endpointvolume.h>
+#pragma comment(lib, "Mmdevapi.lib") // Aseguramiento extra para el linker
 #include <filesystem> // <--- C++17 Standard Filesystem
 
 namespace fs = std::filesystem; // Alias para escribir menos
@@ -142,6 +146,43 @@ py::dict get_disk_status() {
     return info;
 }
 
+// --- SIMULACIÓN DE TECLADO ---
+
+// Función auxiliar para enviar una sola tecla
+void send_key(WORD key, bool key_up = false) {
+    INPUT input = { 0 };
+    input.type = INPUT_KEYBOARD;
+    input.ki.wVk = key;
+    if (key_up) {
+        input.ki.dwFlags = KEYEVENTF_KEYUP;
+    }
+    SendInput(1, &input, sizeof(INPUT));
+}
+
+// Escribe texto simulando pulsaciones de teclado
+void type_text(std::string text) {
+    for (char c : text) {
+        INPUT input = { 0 };
+        input.type = INPUT_KEYBOARD;
+        input.ki.wScan = c;
+        input.ki.dwFlags = KEYEVENTF_UNICODE;
+
+        SendInput(1, &input, sizeof(INPUT)); // Presionar
+
+        input.ki.dwFlags = KEYEVENTF_UNICODE | KEYEVENTF_KEYUP;
+        SendInput(1, &input, sizeof(INPUT)); // Soltar
+
+        // AJUSTE DE CALIDAD: Subimos a 50ms para garantizar que ninguna letra se pierda
+        Sleep(70);
+    }
+}
+
+// Presionar tecla ENTER (Para enviar formularios o comandos)
+void press_enter() {
+    send_key(VK_RETURN);       // Presionar
+    send_key(VK_RETURN, true); // Soltar
+}
+
 // --- GESTIÓN DE ARCHIVOS (VERSIÓN UTF-8 BLINDADA) ---
 
 std::vector<std::string> scan_directory(std::string path_str) {
@@ -178,6 +219,224 @@ std::vector<std::string> scan_directory(std::string path_str) {
     return files;
 }
 
+// --- GESTIÓN DE VENTANAS ---
+
+// Busca una ventana por parte de su título (ej: "Bloc de notas")
+// Retorna: El "Handle" (Identificador único) de la ventana, o 0 si no la halla.
+HWND find_window_by_title_part(std::string text_part) {
+    HWND hCurrent = NULL;
+    // Recorremos todas las ventanas de Windows
+    do {
+        hCurrent = FindWindowEx(NULL, hCurrent, NULL, NULL);
+        char buffer[256];
+        GetWindowTextA(hCurrent, buffer, 256);
+        std::string title(buffer);
+
+        // Si el título contiene el texto que buscamos (ignorando mayúsculas sería mejor, pero simple por ahora)
+        if (title.length() > 0 && title.find(text_part) != std::string::npos) {
+            return hCurrent; // ¡Encontrada!
+        }
+    } while (hCurrent != NULL);
+
+    return NULL; // No encontrada
+}
+
+// Trae una ventana al frente
+bool focus_window(std::string window_title_part) {
+    HWND hWnd = find_window_by_title_part(window_title_part);
+    if (hWnd) {
+        // Restaurar si está minimizada
+        ShowWindow(hWnd, SW_RESTORE);
+        // Traer al frente
+        SetForegroundWindow(hWnd);
+        return true;
+    }
+    return false;
+}
+
+// Maximiza una ventana
+bool maximize_window(std::string window_title_part) {
+    HWND hWnd = find_window_by_title_part(window_title_part);
+    if (hWnd) {
+        ShowWindow(hWnd, SW_MAXIMIZE);
+        return true;
+    }
+    return false;
+}
+
+// Cierra una ventana
+bool close_window_by_title(std::string window_title_part) {
+    HWND hWnd = find_window_by_title_part(window_title_part);
+    if (hWnd) {
+        // Enviamos mensaje de cerrar (Alt+F4 virtual)
+        PostMessage(hWnd, WM_CLOSE, 0, 0);
+        return true;
+    }
+    return false;
+}
+
+// --- CONTROL DEL MOUSE ---
+
+// Mueve el cursor a una posición absoluta
+void move_mouse(int x, int y) {
+    // Convertimos coordenadas de píxeles a coordenadas absolutas de pantalla (0-65535)
+    // Esto es necesario porque SendInput usa un sistema normalizado
+    int screen_width = GetSystemMetrics(SM_CXSCREEN);
+    int screen_height = GetSystemMetrics(SM_CYSCREEN);
+
+    int abs_x = (x * 65535) / screen_width;
+    int abs_y = (y * 65535) / screen_height;
+
+    INPUT input = { 0 };
+    input.type = INPUT_MOUSE;
+    input.mi.dx = abs_x;
+    input.mi.dy = abs_y;
+    input.mi.dwFlags = MOUSEEVENTF_MOVE | MOUSEEVENTF_ABSOLUTE;
+
+    SendInput(1, &input, sizeof(INPUT));
+}
+
+// Hace un clic simple
+void mouse_click(bool is_right_click = false) {
+    INPUT input = { 0 };
+    input.type = INPUT_MOUSE;
+
+    if (is_right_click) {
+        input.mi.dwFlags = MOUSEEVENTF_RIGHTDOWN;
+        SendInput(1, &input, sizeof(INPUT));
+        input.mi.dwFlags = MOUSEEVENTF_RIGHTUP;
+        SendInput(1, &input, sizeof(INPUT));
+    }
+    else {
+        input.mi.dwFlags = MOUSEEVENTF_LEFTDOWN;
+        SendInput(1, &input, sizeof(INPUT));
+        input.mi.dwFlags = MOUSEEVENTF_LEFTUP;
+        SendInput(1, &input, sizeof(INPUT));
+    }
+}
+
+// Obtiene la posición actual del cursor (Retorna una lista [x, y])
+std::vector<int> get_mouse_position() {
+    POINT p;
+    if (GetCursorPos(&p)) {
+        return { p.x, p.y };
+    }
+    return { 0, 0 };
+}
+
+// --- DETECCIÓN DE TECLADO (INPUT SENSING) ---
+
+// Verifica si una tecla específica está presionada FÍSICAMENTE en este instante
+// key_code: Código virtual de la tecla (Ej: 0x1B es ESC)
+bool is_key_pressed(int key_code) {
+    // GetAsyncKeyState devuelve el estado en tiempo real.
+    // Verificamos el bit más significativo (0x8000) que indica "Presionado".
+    return (GetAsyncKeyState(key_code) & 0x8000) != 0;
+}
+
+// --- LIMPIEZA DE SISTEMA ---
+
+// Borra un archivo específico
+bool delete_file(std::string path_str) {
+    try {
+        fs::path path = fs::u8path(path_str);
+        if (fs::exists(path) && fs::is_regular_file(path)) {
+            // remove devuelve true si se borró, false si no
+            return fs::remove(path);
+        }
+    }
+    catch (const std::exception& e) {
+        // Si el archivo está en uso (común en Temp), fallará. Es normal.
+        // Solo lo ignoramos.
+    }
+    return false;
+}
+
+// --- SEGURIDAD Y TIEMPO ---
+
+// Retorna los milisegundos que el sistema ha estado encendido
+unsigned long long get_system_uptime_ms() {
+    return GetTickCount64();
+}
+
+// Bloquea la sesión de Windows (Pantalla de Login)
+// Equivalente a presionar Windows + L
+bool lock_session() {
+    return LockWorkStation();
+}
+
+// --- REDES ---
+
+// Verifica si hay conexión real a internet
+bool check_internet_connection() {
+    // Intenta conectar a Google (puerto 80)
+    // FLAG: 1 (FLAG_ICC_FORCE_CONNECTION)
+    bool connected = InternetCheckConnectionA("http://www.google.com", 1, 0);
+    return connected;
+}
+
+
+// --- CONTROL DE AUDIO (WASAPI) ---
+
+// Cambia el volumen maestro (0.0 a 1.0)
+// Ejemplo: 0.5 es 50%
+bool set_master_volume(float level) {
+    HRESULT hr;
+
+    // 1. Inicializamos la librería COM (si no estaba ya)
+    CoInitialize(NULL);
+
+    IMMDeviceEnumerator* deviceEnumerator = NULL;
+    IMMDevice* defaultDevice = NULL;
+    IAudioEndpointVolume* endpointVolume = NULL;
+
+    // 2. Obtenemos el enumerador de dispositivos
+    hr = CoCreateInstance(__uuidof(MMDeviceEnumerator), NULL, CLSCTX_INPROC_SERVER, __uuidof(IMMDeviceEnumerator), (LPVOID*)&deviceEnumerator);
+    if (FAILED(hr)) return false;
+
+    // 3. Obtenemos las bocinas predeterminadas
+    hr = deviceEnumerator->GetDefaultAudioEndpoint(eRender, eMultimedia, &defaultDevice);
+    if (FAILED(hr)) { deviceEnumerator->Release(); return false; }
+
+    // 4. Activamos el control de volumen
+    hr = defaultDevice->Activate(__uuidof(IAudioEndpointVolume), CLSCTX_INPROC_SERVER, NULL, (LPVOID*)&endpointVolume);
+    if (FAILED(hr)) { defaultDevice->Release(); deviceEnumerator->Release(); return false; }
+
+    // 5. AJUSTAMOS EL VOLUMEN
+    // Nos aseguramos que el nivel esté entre 0.0 y 1.0
+    if (level < 0.0f) level = 0.0f;
+    if (level > 1.0f) level = 1.0f;
+
+    hr = endpointVolume->SetMasterVolumeLevelScalar(level, NULL);
+
+    // 6. Limpieza de memoria (Vital en C++)
+    endpointVolume->Release();
+    defaultDevice->Release();
+    deviceEnumerator->Release();
+
+    return SUCCEEDED(hr);
+}
+
+// Silencia o reactiva el audio (Mute Toggle)
+bool set_mute(bool mute) {
+    CoInitialize(NULL);
+    IMMDeviceEnumerator* deviceEnumerator = NULL;
+    IMMDevice* defaultDevice = NULL;
+    IAudioEndpointVolume* endpointVolume = NULL;
+
+    CoCreateInstance(__uuidof(MMDeviceEnumerator), NULL, CLSCTX_INPROC_SERVER, __uuidof(IMMDeviceEnumerator), (LPVOID*)&deviceEnumerator);
+    deviceEnumerator->GetDefaultAudioEndpoint(eRender, eMultimedia, &defaultDevice);
+    defaultDevice->Activate(__uuidof(IAudioEndpointVolume), CLSCTX_INPROC_SERVER, NULL, (LPVOID*)&endpointVolume);
+
+    // AJUSTAMOS EL MUTE
+    endpointVolume->SetMute(mute, NULL);
+
+    endpointVolume->Release();
+    defaultDevice->Release();
+    deviceEnumerator->Release();
+    return true;
+}
+
 // --- MÓDULO PRINCIPAL ---
 PYBIND11_MODULE(ruth_backend, m) {
     m.doc() = "Módulo Service Desk Ruth v0.5";
@@ -197,6 +456,28 @@ PYBIND11_MODULE(ruth_backend, m) {
 
     m.def("get_memory_status", &get_memory_status, "Obtiene el estado de la memoria RAM");
     m.def("get_disk_status", &get_disk_status, "Obtiene el estado del disco C:");
-
     m.def("scan_directory", &scan_directory, "Lista archivos en una ruta");
+
+    m.def("type_text", &type_text, "Escribe texto simulado");
+    m.def("press_enter", &press_enter, "Presiona la tecla Enter");
+    
+    m.def("focus_window", &focus_window, "Trae ventana al frente");
+    m.def("maximize_window", &maximize_window, "Maximiza ventana");
+    m.def("close_window_by_title", &close_window_by_title, "Cierra ventana");
+
+    
+    m.def("move_mouse", &move_mouse, "Mueve el cursor a X, Y");
+    m.def("mouse_click", &mouse_click, "Hace clic (true para derecho)");
+
+    m.def("get_mouse_position", &get_mouse_position, "Obtiene coords X, Y");
+    m.def("is_key_pressed", &is_key_pressed, "Detecta si una tecla está presionada");
+    m.def("delete_file", &delete_file, "Borra un archivo del sistema");
+
+    m.def("get_system_uptime_ms", &get_system_uptime_ms, "Milisegundos desde el inicio");
+    m.def("lock_session", &lock_session, "Bloquea la sesión de Windows");
+
+    m.def("check_internet_connection", &check_internet_connection, "Verifica salida a internet");
+    m.def("set_master_volume", &set_master_volume, "Pone volumen (0.0 a 1.0)");
+    m.def("set_mute", &set_mute, "Silencia (True) o Reactiva (False)");
+
 }

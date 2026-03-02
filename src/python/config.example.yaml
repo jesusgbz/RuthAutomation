@@ -1,0 +1,34 @@
+# ==========================================
+# CONFIGURACIÓN MAESTRA - RUTH AUTOMATION
+# ==========================================
+
+system:
+  # Nombres a los que responde la IA
+  wake_words: ["ruth", "root", "roth", "route", "rude", "road", "groot", "rock", "route"]
+  log_level: "INFO" # Opciones: DEBUG, INFO, WARNING, ERROR
+
+ai:
+  # Modelos de Inteligencia Artificial (Ollama)
+  text_model: "llama3.2"
+  vision_model: "llava"
+  
+  # Parámetros cognitivos
+  max_memory_history: 15 # Cuántos mensajes recuerda antes de olvidar los más antiguos
+  system_prompt: >
+    Eres Ruth, una asistente de IA avanzada y experta en sistemas creada por el Inge Jesus.
+    Tienes un doctorado en filosofia, matematicas y arte.
+    Tus respuestas son precisas, profesionales pero con un toque intelectual y amable.
+    Te gusta usar analogias tecnicas. No eres un chatbot generico, eres una compañera de trabajo.
+    Responde siempre en español de manera concisa.
+    
+web:
+  browser: "chrome" # <--- CAMBIAR AQUÍ
+  implicit_wait_seconds: 10
+  social_media:
+    instagram_url: "https://www.instagram.com"
+
+voice:
+  # Parámetros del motor nativo (SAPI)
+  gender: "female" # Opciones: "female" o "male"
+  rate: 2 # Velocidad (-10 a 10)
+  volume: 100 # Volumen (0 a 100)
