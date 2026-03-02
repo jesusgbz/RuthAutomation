@@ -5,6 +5,12 @@ from ruth.eyes import RuthEyes
 import sys
 import winsound # <--- Sonido nativo de Windows (Feedback auditivo)
 import time
+import subprocess
+
+# --- EXCEPCIÓN PERSONALIZADA ---
+class OTAUpdateRestart(Exception):
+    """Excepción lanzada cuando Ruth necesita reiniciar para aplicar una actualización"""
+    pass
 
 def main():
     # 1. INICIALIZACIÓN
@@ -72,6 +78,29 @@ def main():
             elif "olvida todo" in command or "reiniciar cerebro" in command or "borrar memoria" in command:
                 brain.clear_memory() # Usamos el objeto brain que creamos al inicio
                 app.speak("Memoria a corto plazo reiniciada. Estoy lista para un nuevo tema.")
+
+            # --- COMANDO OTA ---
+            elif "actualizar sistema" in command or "descargar mejoras" in command or "protocolo ota" in command:
+                app.speak("Iniciando protocolo O. T. A. Verificando conexión con el repositorio central...")
+                app.log("Iniciando comando git pull...")
+                
+                try:
+                    # Ejecutamos git pull de forma silenciosa y capturamos la salida
+                    result = subprocess.run(["git", "pull", "origin", "main"], capture_output=True, text=True, check=True)
+                    salida_git = result.stdout.lower()
+                    
+                    if "already up to date" in salida_git or "ya está actualizado" in salida_git:
+                        app.speak("El sistema ya cuenta con la versión más reciente. No se requieren cambios.")
+                        app.log("OTA: Sistema ya actualizado.")
+                    else:
+                        app.speak("Actualización descargada e inyectada exitosamente. Reiniciando el córtex cerebral para aplicar los cambios.")
+                        app.log(f"OTA: Código nuevo descargado. {salida_git}")
+                        # Lanzamos nuestra excepción para que el Watchdog nos reinicie
+                        raise OTAUpdateRestart()
+                        
+                except subprocess.CalledProcessError as e:
+                    app.speak("Ocurrió un error al contactar al repositorio. Revisa mi bitácora.")
+                    app.log(f"Error OTA Git: {e.stderr}", level="error")
 
             elif "adiós" in command or "apagar" in command or "terminar" in command:
                 app.speak("Cerrando sesión. ¡Hasta luego, Inge!")
@@ -236,6 +265,12 @@ if __name__ == "__main__":
             # Si tú presionas Ctrl+C fuerte para matarla, el Watchdog respeta tu orden
             print("\n[WATCHDOG] Interrupción manual detectada. Terminando procesos.")
             sys.exit(0)
+
+        except OTAUpdateRestart: # <--- NUEVO: EL REINICIO PACÍFICO
+            print("\n[WATCHDOG] 🔄 PROTOCOLO OTA INICIADO: Reiniciando el sistema para aplicar nuevas mejoras...")
+            time.sleep(3)
+            # No sumamos a restart_count porque es un reinicio deseado, no un crasheo.
+            continue
             
         except Exception as e:
             # ¡Si ocurre un Crash Fatal, el Watchdog lo atrapa y reinicia!
